@@ -10,6 +10,10 @@ module Reddit
       "<Reddit::Submission id='#{id}' author='#{@author}' title='#{title}'>"
     end
 
+    def to_hash
+      Hash[instance_variables.map { |var| [var[1..-1].to_sym, instance_variable_get(var)] }]
+    end
+
     # Add a comment to a submission
     # @param [String] Comment text
     # @return [true,false]

@@ -7,7 +7,7 @@ module Reddit
 
     attr_reader :last_action, :debug
     base_uri "www.reddit.com"
-    class << self; attr_reader :cookie, :modhash, :user_id, :user, :throttle_duration end
+    class << self; attr_reader :cookie, :modhash, :before, :after, :user_id, :user, :throttle_duration end
 
     @throttle_duration = 1.0
 
@@ -44,6 +44,18 @@ module Reddit
       Reddit::Base.modhash
     end
 
+    # Collection before
+    # @return [String, nil]
+    def before
+      Reddit::Base.before
+    end
+
+    # Collection after
+    # @return [String, nil]
+    def after
+      Reddit::Base.after
+    end
+
     # Reddit's displayed ID for the logged in user
     # @return [String]
     def user_id
@@ -78,6 +90,8 @@ module Reddit
     def read(url, options={})
       unless throttled?
         @debug.rewind
+        Reddit::Base.instance_variable_set("@before", nil)
+        Reddit::Base.instance_variable_set("@after", nil)
         verb      = (options[:verb] || "get")
         param_key = (verb == "get") ? :query : :body
         resp      = self.class.send( verb, url, {param_key => (options[param_key] || {}), :headers => base_headers, :debug_output => @debug})
